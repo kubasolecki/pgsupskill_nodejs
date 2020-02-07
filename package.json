@@ -1,0 +1,30 @@
+{
+  "name": "pgsupskill",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon --config \"./util/nodemon.json\"/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kubasolecki/pgsupskill_nodejs.git"
+  },
+  "author": "Jakub Solecki",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kubasolecki/pgsupskill_nodejs/issues"
+  },
+  "homepage": "https://github.com/kubasolecki/pgsupskill_nodejs#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "@types/node": "^13.7.0",
+    "nodemon": "^2.0.2",
+    "ts-node": "^8.6.2",
+    "tslint": "^6.0.0",
+    "typescript": "^3.7.5"
+  }
+}
