@@ -12,4 +12,4 @@ const UserSchema: Schema = new Schema({
   lastName: { type: String, required: true },
 });
 
-export default model<IUser & Promise<Document>>('User', UserSchema);
+export default model<IUser>('User', UserSchema);
