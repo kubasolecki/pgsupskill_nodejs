@@ -1,17 +1,13 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
-    "strict": true,
-    "baseUrl": "./",
-    "outDir": "build",
-    "removeComments": true,
-    "experimentalDecorators": true,
+    "sourceMap": true,
     "target": "es6",
-    "emitDecoratorMetadata": true,
-    "moduleResolution": "node",
-    "importHelpers": true,
+    "module": "commonjs",
+    "outDir": "./dist",
+    "baseUrl": "./src",
     "types": [
-      "node"
+      "node",
+      "src/types/*"
     ],
     "typeRoots": [
       "node_modules/@types"
