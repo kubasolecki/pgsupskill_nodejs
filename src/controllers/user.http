@@ -1,0 +1,15 @@
+GET http://localhost:3000/api/user HTTP/1.1
+content-type: application/json
+
+{}
+
+###
+
+POST http://localhost:3000/api/user HTTP/1.1
+content-type: application/json
+
+{
+    "email": "kuba@email.com",
+    "firstName": "kuba",
+    "lastName": "kuba"
+}

@@ -2,6 +2,7 @@
   "compilerOptions": {
     "sourceMap": true,
     "target": "es6",
+    "esModuleInterop": true,
     "module": "commonjs",
     "outDir": "./dist",
     "baseUrl": "./src",
