@@ -1,23 +1,9 @@
-import * as express from 'express';
-import { Request, Response } from 'express';
+import { Router, Request, Response } from 'express';
 
-import IBaseController from '../interfaces/base.interface';
+const router = Router();
 
-class HomeController implements IBaseController {
-  public path = '/';
-  public router = express.Router();
+router.get('/', (_: Request, response: Response) => {
+  response.send('home');
+});
 
-  constructor() {
-    this.intializeRoutes();
-  }
-
-  intializeRoutes(): void {
-    this.router.get(this.path, this.homepage);
-  }
-
-  homepage(req: Request, res: Response): void {
-    res.send('Homepage');
-  }
-}
-
-export default HomeController
+export default router;
