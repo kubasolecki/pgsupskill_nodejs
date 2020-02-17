@@ -11,5 +11,5 @@ content-type: application/json
 {
     "email": "kuba@email.com",
     "firstName": "kuba",
-    "lastName": "kuba"
+    "lastName": "2"
 }
