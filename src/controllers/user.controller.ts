@@ -12,17 +12,18 @@ router.get('/', async (_: Request, response: Response) => {
 });
 
 router.post('/', (request: Request, response: Response) => {
-      const user = new UserModel({
-        email: 'kuba@email.com',
-        firstName: 'kuba',
-        lastName: 'pgs',
-      });
+  const user = new UserModel({
+    email: 'kuba@email.com',
+    firstName: 'kuba',
+    lastName: 'pgs',
+  });
 
-    user.save()
-      .then((savedUser: IUser) => {
-        response.json(savedUser);
-      })
-      .catch(err => response.status(400).send(err));
+  user
+    .save()
+    .then((savedUser: IUser) => {
+      response.json(savedUser);
+    })
+    .catch(err => response.status(400).send(err));
 });
 
 export default router;

@@ -1,0 +1,9 @@
+const CONFLICT = 409;
+const NOT_FOUND = 404;
+const BAD_REQUEST = 400;
+
+export {
+  NOT_FOUND,
+  BAD_REQUEST,
+  CONFLICT
+}
