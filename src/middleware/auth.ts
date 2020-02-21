@@ -3,10 +3,9 @@ import * as jwt from 'jsonwebtoken';
 import UserModel from '../models/user';
 import config from '../../env';
 import WrongTokenException from '../exceptions/wrong-token.exception';
+import { Upskill } from '../types/auth';
 
-interface AuthorizedRequest extends Request {
-  user: Upskill.Auth.User
-}
+type AuthorizedRequest = { user?: Upskill.Auth.User } & Request;
 
 export default async function (request: AuthorizedRequest, response: Response, next: NextFunction ) {
   const cookies = request.cookies;

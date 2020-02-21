@@ -6,6 +6,7 @@ import UserModel from '../models/user';
 import WrongCredentialsException from '../exceptions/wrong-credentials.exception';
 import UserEmailAlreadyExistsException from '../exceptions/user-email-already-exists.exception';
 import config from '../../env';
+import { Upskill } from '../types/auth';
 
 const router = Router();
 
@@ -52,10 +53,30 @@ router.post(
           user.password
         );
         if (isPasswordMatching) {
-          delete user.password;
+          /* 
+            TODO: 
+            z jednej strony na interfejsie mówisz że password jest typu string :)
+            a potem chcesz go ustawić na undefined. typescript na to nie pozwala! 
+            jeśli chcesz zrobić
+            user.password = undefined
+            musisz w interface dać
+
+            interface User extends Document {
+                _id: string;
+                name: string;
+                email: string;
+                password?: string;
+              }
+
+
+          */
+          const { email, _id } = user;
           const tokenData = createToken(user);
           response.setHeader('Set-Cookie', [createCookie(tokenData)]);
-          response.send(user);
+          response.send({
+            email,
+            _id
+          });
         } else {
           next(new WrongCredentialsException());
         }
@@ -75,6 +96,11 @@ router.post('/logout', (request: Request, response: Response) => {
 
 const createToken = (user: Upskill.Auth.User): Upskill.Auth.TokenData => {
   const expiresIn = 60 * 60; // an hour
+  /* 
+  TODO:
+  jeśli używałeś process.env... to każda z jego propert jest string | undefined
+  przecieka Ci przez palce możliwy undefined
+  */
   const secret = config.JWT_SECRET;
   const dataStoredInToken: Upskill.Auth.DataStoredInToken = {
     _id: user._id,

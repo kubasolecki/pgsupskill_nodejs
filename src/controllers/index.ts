@@ -2,10 +2,14 @@ import { Router } from 'express';
 import UserController from './user.controller';
 import HomeController from './home.controller';
 import AuthController from './auth.controller';
-import authMiddleware from '../middleware/auth';
 
 const router = Router();
-// router.use('/user', authMiddleware)
+
+/*
+    TODO:
+    w ten sposób precyzyjnie mówimy że chodzi nam o ten kontroler a nie przypadkowo zbieżne string
+*/
+
 router.use('/user', UserController);
 
 router.use('/auth', AuthController);
