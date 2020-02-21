@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
-import UserModel, { IUser } from '../models/user';
+import UserModel from '../models/user';
+import { auth } from '../types/auth';
 
 const router = Router();
 
@@ -20,7 +21,7 @@ router.post('/', (request: Request, response: Response) => {
 
   user
     .save()
-    .then((savedUser: IUser) => {
+    .then((savedUser: auth.User) => {
       response.json(savedUser);
     })
     .catch(err => response.status(400).send(err));

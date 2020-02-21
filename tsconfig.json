@@ -8,10 +8,9 @@
     "baseUrl": "./src",
     "types": [
       "node",
-      "src/types/*"
     ],
     "typeRoots": [
-      "node_modules/@types"
+      "node_modules/@types",
     ]
   },
   "include": [
