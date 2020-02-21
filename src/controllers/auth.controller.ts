@@ -5,14 +5,14 @@ import jwt from 'jsonwebtoken';
 import UserModel from '../models/user';
 import WrongCredentialsException from '../exceptions/wrong-credentials.exception';
 import UserEmailAlreadyExistsException from '../exceptions/user-email-already-exists.exception';
-import { auth } from '../types/auth';
+import config from '../../env';
 
 const router = Router();
 
 router.post(
   '/register',
   async (request: Request, response: Response, next: NextFunction) => {
-    const userData: auth.CreateUser = request.body;
+    const userData: Upskill.Auth.CreateUser = request.body;
     try {
       const foundUser = await UserModel.findOne({ email: userData.email });
 
@@ -52,7 +52,7 @@ router.post(
           user.password
         );
         if (isPasswordMatching) {
-          user.password = undefined;
+          delete user.password;
           const tokenData = createToken(user);
           response.setHeader('Set-Cookie', [createCookie(tokenData)]);
           response.send(user);
@@ -73,10 +73,10 @@ router.post('/logout', (request: Request, response: Response) => {
   response.send(200);
 });
 
-const createToken = (user: auth.User): auth.TokenData => {
+const createToken = (user: Upskill.Auth.User): Upskill.Auth.TokenData => {
   const expiresIn = 60 * 60; // an hour
-  const secret = process.env.JWT_SECRET;
-  const dataStoredInToken: auth.DataStoredInToken = {
+  const secret = config.JWT_SECRET;
+  const dataStoredInToken: Upskill.Auth.DataStoredInToken = {
     _id: user._id,
   };
   return {
@@ -85,7 +85,7 @@ const createToken = (user: auth.User): auth.TokenData => {
   };
 };
 
-const createCookie = (tokenData: auth.TokenData) => {
+const createCookie = (tokenData: Upskill.Auth.TokenData) => {
   return `Authorization=${tokenData.token}; HttpOnly; Max-Age=${tokenData.expiresIn}`;
 };
 

@@ -1,7 +1,7 @@
 import { Document } from "mongoose";
-import { CookieOptions } from "express";
+import { CookieOptions, Request } from "express";
 
-declare namespace auth{
+namespace Upskill.Auth {
   interface User extends Document {
     _id: string;
     name: string;
