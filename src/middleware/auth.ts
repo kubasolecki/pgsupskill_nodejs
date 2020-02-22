@@ -3,15 +3,13 @@ import jwt from 'jsonwebtoken';
 
 import UserModel from '../models/user';
 import WrongTokenException from '../exceptions/wrong-token.exception';
-import { auth } from '../types/auth';
 import env from '../../env';
+import { Upskill } from '../types/auth';
 
-interface RequestWithUser extends Request { // TODO import from namespace
-  user: auth.User;
-}
+type AuthorizedRequest = { user?: Upskill.Auth.User } & Request;
 
 
-const authMiddleware = async (request: RequestWithUser, response: Response, next: NextFunction ) => {
+const authMiddleware = async (request: AuthorizedRequest, response: Response, next: NextFunction ) => {
   const cookies = request.cookies;
   
   if (cookies && cookies.Authorization) {
@@ -20,18 +18,21 @@ const authMiddleware = async (request: RequestWithUser, response: Response, next
       const verificationResponse = jwt.verify(
         cookies.Authorization,
         secret
-      ) as auth.DataStoredInToken;
+      ) as Upskill.Auth.DataStoredInToken;
+      
       const id = verificationResponse._id;
       const user = await UserModel.findById(id);
+      
       if (user) {
-        request.user = user;
+        request.user= user;
         next();
       }
     } catch (error) {
       next(new WrongTokenException());
     }
+  } else {
+    next(new WrongTokenException());
   }
-  next(new WrongTokenException());
 }
 
-export default authMiddleware;
+export default authMiddleware

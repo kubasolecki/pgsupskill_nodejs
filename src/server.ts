@@ -2,7 +2,7 @@ import loggerMiddleware from './middleware/logger';
 import mongoose from 'mongoose';
 import express from 'express';
 import bodyParser from 'body-parser';
-import cookieParser from 'cookie-parser';  
+import cookieParser from 'cookie-parser';
 
 import errorHandler from './middleware/error';
 import env from '../env';

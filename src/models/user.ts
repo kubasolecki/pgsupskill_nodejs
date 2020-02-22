@@ -1,5 +1,5 @@
 import { Schema, model } from 'mongoose';
-import { auth } from '../types/auth';
+import { Upskill } from '../types/auth';
 
 const UserSchema: Schema = new Schema({
   name: String,
@@ -7,4 +7,4 @@ const UserSchema: Schema = new Schema({
   password: String,
 });
 
-export default model<auth.User>('User', UserSchema);
+export default model<Upskill.Auth.User>('User', UserSchema);
