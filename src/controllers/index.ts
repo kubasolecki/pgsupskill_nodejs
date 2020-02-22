@@ -5,8 +5,7 @@ import AuthController from './auth.controller';
 import authMiddleware from '../middleware/auth';
 
 const router = Router();
-router.use('/user', authMiddleware)
-router.use('/user', UserController);
+router.use('/user', authMiddleware, UserController);
 router.use('/auth', AuthController);
 router.use('/', HomeController);
 

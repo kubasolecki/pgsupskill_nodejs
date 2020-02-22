@@ -1,14 +1,21 @@
 import { NextFunction, Response, Request } from 'express';
-import * as jwt from 'jsonwebtoken';
-import UserModel from 'models/user';
+import jwt from 'jsonwebtoken';
 
+import UserModel from '../models/user';
 import WrongTokenException from '../exceptions/wrong-token.exception';
 import { auth } from '../types/auth';
+import env from '../../env';
 
-const authMiddleware = async (request: Request, response: Response, next: NextFunction ) => {
+interface RequestWithUser extends Request { // TODO import from namespace
+  user: auth.User;
+}
+
+
+const authMiddleware = async (request: RequestWithUser, response: Response, next: NextFunction ) => {
   const cookies = request.cookies;
+  
   if (cookies && cookies.Authorization) {
-    const secret = process.env.JWT_SECRET;
+    const secret = env.JWT_SECRET;
     try {
       const verificationResponse = jwt.verify(
         cookies.Authorization,

@@ -52,10 +52,14 @@ router.post(
           user.password
         );
         if (isPasswordMatching) {
-          user.password = undefined;
           const tokenData = createToken(user);
           response.setHeader('Set-Cookie', [createCookie(tokenData)]);
-          response.send(user);
+          response.send({
+            data: {
+              user: { email: user.email },
+            },
+            message: 'User successfully created',
+          });
         } else {
           next(new WrongCredentialsException());
         }
