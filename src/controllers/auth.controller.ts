@@ -7,11 +7,14 @@ import WrongCredentialsException from '../exceptions/wrong-credentials.exception
 import UserEmailAlreadyExistsException from '../exceptions/user-email-already-exists.exception';
 import config from '../../env';
 import { Upskill } from '../types/auth';
+import validationMiddleware from '../middleware/validation.middleware';
+import CreateUserDto from '../validators/create-user.dto';
 
 const router = Router();
 
 router.post(
   '/register',
+  validationMiddleware(CreateUserDto),
   async (request: Request, response: Response, next: NextFunction) => {
     const userData: Upskill.Auth.CreateUser = request.body;
     try {
