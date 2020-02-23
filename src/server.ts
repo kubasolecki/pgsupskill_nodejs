@@ -2,6 +2,7 @@ import loggerMiddleware from './middleware/logger';
 import mongoose from 'mongoose';
 import express from 'express';
 import bodyParser from 'body-parser';
+import cookieParser from 'cookie-parser';
 
 import errorHandler from './middleware/error';
 import env from '../env';
@@ -10,6 +11,7 @@ import controllers from './controllers';
 const app = express();
 
 app.use(bodyParser.json());
+app.use(cookieParser());
 
 app.use('/api', loggerMiddleware);
 app.use('/api', controllers);

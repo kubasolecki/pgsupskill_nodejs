@@ -1,0 +1,13 @@
+const CONFLICT = 409;
+const NOT_FOUND = 404;
+const UNAUTHORIZED = 401;
+const BAD_REQUEST = 400;
+const SUCCESS = 200;
+
+export {
+  NOT_FOUND,
+  BAD_REQUEST,
+  CONFLICT,
+  UNAUTHORIZED,
+  SUCCESS
+}

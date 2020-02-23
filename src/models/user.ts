@@ -1,15 +1,10 @@
-import { Schema, Document, model } from 'mongoose';
-
-export interface IUser extends Document {
-  email: string;
-  firstName: string;
-  lastName: string;
-}
+import { Schema, model } from 'mongoose';
+import { Upskill } from '../types/auth';
 
 const UserSchema: Schema = new Schema({
-  email: { type: String, required: true, unique: true },
-  firstName: { type: String, required: true },
-  lastName: { type: String, required: true },
+  name: String,
+  email: String,
+  password: String,
 });
 
-export default model<IUser>('User', UserSchema);
+export default model<Upskill.Auth.User>('User', UserSchema);
