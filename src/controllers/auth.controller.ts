@@ -9,39 +9,45 @@ import config from '../../env';
 import { Upskill } from '../types/auth';
 import validationMiddleware from '../middleware/validation.middleware';
 import CreateUserDto from '../validators/create-user.dto';
+import { asyncWrapper } from "../middleware/async.wrapper";
 
 const router = Router();
+
+interface IRegisterUserResponse {
+  message: string;
+  data: {
+    user: {
+      email: string;
+    }
+  }
+}
 
 router.post(
   '/register',
   validationMiddleware(CreateUserDto),
-  async (request: Request, response: Response, next: NextFunction) => {
+  asyncWrapper<IRegisterUserResponse>(async (request: Request, response: Response) => {
     const userData: Upskill.Auth.CreateUser = request.body;
-    try {
-      const foundUser = await UserModel.findOne({ email: userData.email });
+    const foundUser = await UserModel.findOne({ email: userData.email });
 
-      if (foundUser) {
-        next(new UserEmailAlreadyExistsException(foundUser.email));
-      } else {
-        const hashedPassword = await bcrypt.hash(userData.password, 10);
-        const user = await UserModel.create({
-          ...userData,
-          password: hashedPassword,
-        });
-        const tokenData = createToken(user);
-        response.setHeader('Set-Cookie', [createCookie(tokenData)]);
+    if (foundUser) {
+      throw new UserEmailAlreadyExistsException(foundUser.email);
+    } else {
+      const hashedPassword = await bcrypt.hash(userData.password, 10);
+      const user = await UserModel.create({
+        ...userData,
+        password: hashedPassword,
+      });
+      const tokenData = createToken(user);
+      response.setHeader('Set-Cookie', [createCookie(tokenData)]);
 
-        response.send({
-          data: {
-            user: { email: user.email },
-          },
-          message: 'User successfully created',
-        });
-      }
-    } catch (err) {
-      next(err);
+      return {
+        data: {
+          user: { email: user.email },
+        },
+        message: 'User successfully created',
+      };
     }
-  }
+  })
 );
 
 router.post(
