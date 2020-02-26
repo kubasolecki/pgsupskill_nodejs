@@ -29,6 +29,7 @@ export function validationWrapper<T, K>(
           next(new HttpException(BAD_REQUEST, message));
         }
       });
+      request.model = request.body;
       return controller(request, response, next);
     }
   );

@@ -1,3 +1,4 @@
+import { GenericRequest } from './../types/controller.d';
 import { Router, Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
@@ -28,14 +29,14 @@ router.post(
   '/register',
   validationWrapper<CreateUserDto, IRegisterUserResponse>(
     CreateUserDto,
-    async (request: Request, response: Response) => {
-      const userData: Upskill.Auth.CreateUser = request.body;
-      const foundUser = await UserModel.findOne({ email: userData.email });
+    async (request: GenericRequest<CreateUserDto>, response: Response) => {
+      const userData = request.model;
+      const foundUser = await UserModel.findOne({ email: userData?.email });
 
       if (foundUser) {
         throw new UserEmailAlreadyExistsException(foundUser.email);
       } else {
-        const hashedPassword = await bcrypt.hash(userData.password, 10);
+        const hashedPassword = await bcrypt.hash(userData?.password, 10);
         const user = await UserModel.create({
           ...userData,
           password: hashedPassword,
@@ -67,13 +68,13 @@ router.post(
   '/login',
   validationWrapper<LoginUserDto, ILoginUserResponse>(
     LoginUserDto,
-    async (request: Request, response: Response) => {
-      const user = await UserModel.findOne({ email: request.body.email });
+    async (request: GenericRequest<LoginUserDto>, response: Response) => {
+      const user = await UserModel.findOne({ email: request.model?.email });
       if (!user) {
         throw new WrongCredentialsException();
       }
       const isPasswordMatching = await bcrypt.compare(
-        request.body.password,
+        request.model?.password,
         user.password
       );
       if (!isPasswordMatching) {
