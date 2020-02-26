@@ -9,7 +9,8 @@ import config from '../../env';
 import { Upskill } from '../types/auth';
 import validationMiddleware from '../middleware/validation.middleware';
 import CreateUserDto from '../validators/create-user.dto';
-import { asyncWrapper } from "../middleware/async.wrapper";
+import { asyncWrapper } from '../middleware/async.wrapper';
+import { validationWrapper } from '../middleware/validation.wrapper';
 
 const router = Router();
 
@@ -18,36 +19,38 @@ interface IRegisterUserResponse {
   data: {
     user: {
       email: string;
-    }
-  }
+    };
+  };
 }
 
 router.post(
   '/register',
-  validationMiddleware(CreateUserDto),
-  asyncWrapper<IRegisterUserResponse>(async (request: Request, response: Response) => {
-    const userData: Upskill.Auth.CreateUser = request.body;
-    const foundUser = await UserModel.findOne({ email: userData.email });
+  validationWrapper<CreateUserDto, IRegisterUserResponse>(
+    CreateUserDto,
+    async (request: Request, response: Response) => {
+      const userData: Upskill.Auth.CreateUser = request.body;
+      const foundUser = await UserModel.findOne({ email: userData.email });
 
-    if (foundUser) {
-      throw new UserEmailAlreadyExistsException(foundUser.email);
-    } else {
-      const hashedPassword = await bcrypt.hash(userData.password, 10);
-      const user = await UserModel.create({
-        ...userData,
-        password: hashedPassword,
-      });
-      const tokenData = createToken(user);
-      response.setHeader('Set-Cookie', [createCookie(tokenData)]);
+      if (foundUser) {
+        throw new UserEmailAlreadyExistsException(foundUser.email);
+      } else {
+        const hashedPassword = await bcrypt.hash(userData.password, 10);
+        const user = await UserModel.create({
+          ...userData,
+          password: hashedPassword,
+        });
+        const tokenData = createToken(user);
+        response.setHeader('Set-Cookie', [createCookie(tokenData)]);
 
-      return {
-        data: {
-          user: { email: user.email },
-        },
-        message: 'User successfully created',
-      };
+        return {
+          data: {
+            user: { email: user.email },
+          },
+          message: 'User successfully created',
+        };
+      }
     }
-  })
+  )
 );
 
 router.post(
