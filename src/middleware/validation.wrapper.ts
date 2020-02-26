@@ -29,7 +29,7 @@ export function validationWrapper<T, K>(
           next(new HttpException(BAD_REQUEST, message));
         }
       });
-      return await controller(request, response, next);
+      return controller(request, response, next);
     }
   );
 }

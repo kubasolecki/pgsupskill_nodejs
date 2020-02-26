@@ -9,6 +9,7 @@ import config from '../../env';
 import { Upskill } from '../types/auth';
 import validationMiddleware from '../middleware/validation.middleware';
 import CreateUserDto from '../validators/create-user.dto';
+import LoginUserDto from '../validators/login-user.dto';
 import { asyncWrapper } from '../middleware/async.wrapper';
 import { validationWrapper } from '../middleware/validation.wrapper';
 
@@ -53,36 +54,43 @@ router.post(
   )
 );
 
+interface ILoginUserResponse {
+  message: string;
+  data: {
+    user: {
+      email: string;
+    };
+  };
+}
+
 router.post(
   '/login',
-  async (request: Request, response: Response, next: NextFunction) => {
-    try {
+  validationWrapper<LoginUserDto, ILoginUserResponse>(
+    LoginUserDto,
+    async (request: Request, response: Response) => {
       const user = await UserModel.findOne({ email: request.body.email });
-
-      if (user) {
-        const isPasswordMatching = await bcrypt.compare(
-          request.body.password,
-          user.password
-        );
-        if (isPasswordMatching) {
-          const tokenData = createToken(user);
-          response.setHeader('Set-Cookie', [createCookie(tokenData)]);
-          response.send({
-            data: {
-              user: { email: user.email },
-            },
-            message: 'User successfully created',
-          });
-        } else {
-          next(new WrongCredentialsException());
-        }
-      } else {
-        next(new WrongCredentialsException());
+      if (!user) {
+        throw new WrongCredentialsException();
       }
-    } catch (err) {
-      next(err);
+      const isPasswordMatching = await bcrypt.compare(
+        request.body.password,
+        user.password
+      );
+      if (!isPasswordMatching) {
+        throw new WrongCredentialsException();
+      }
+
+      const tokenData = createToken(user);
+      response.setHeader('Set-Cookie', [createCookie(tokenData)]);
+
+      return {
+        data: {
+          user: { email: user.email },
+        },
+        message: 'Successfully logged in',
+      };
     }
-  }
+  )
 );
 
 router.post('/logout', (request: Request, response: Response) => {
