@@ -1,5 +1,5 @@
-import HttpException from './http.exception';
-import { CONFLICT } from '../status_codes';
+import HttpException from '../../../exceptions/http.exception';
+import { CONFLICT } from '../../../status_codes';
 
 class UserEmailAlreadyExistsException extends HttpException {
   constructor(email: string) {
