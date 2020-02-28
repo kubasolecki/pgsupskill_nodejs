@@ -1,10 +1,10 @@
-import loggerMiddleware from './middleware/logger';
+import loggerMiddleware from './middleware/logger.middleware';
 import mongoose from 'mongoose';
 import express from 'express';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 
-import errorHandler from './middleware/error';
+import errorHandler from './middleware/error.middleware';
 import env from '../env';
 import controllers from './controllers';
 

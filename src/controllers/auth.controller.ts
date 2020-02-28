@@ -1,3 +1,4 @@
+import { GenericRequest } from './../types/controller.d';
 import { Router, Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
@@ -7,20 +8,35 @@ import WrongCredentialsException from '../exceptions/wrong-credentials.exception
 import UserEmailAlreadyExistsException from '../exceptions/user-email-already-exists.exception';
 import config from '../../env';
 import { Upskill } from '../types/auth';
+import validationMiddleware from '../middleware/validation.middleware';
+import CreateUserDto from '../validators/create-user.dto';
+import LoginUserDto from '../validators/login-user.dto';
+import { asyncWrapper } from '../middleware/async.wrapper';
+import { validationWrapper } from '../middleware/validation.wrapper';
 
 const router = Router();
 
+interface IRegisterUserResponse {
+  message: string;
+  data: {
+    user: {
+      email: string;
+    };
+  };
+}
+
 router.post(
   '/register',
-  async (request: Request, response: Response, next: NextFunction) => {
-    const userData: Upskill.Auth.CreateUser = request.body;
-    try {
-      const foundUser = await UserModel.findOne({ email: userData.email });
+  validationWrapper<CreateUserDto, IRegisterUserResponse>(
+    CreateUserDto,
+    async (request: GenericRequest<CreateUserDto>, response: Response) => {
+      const userData = request.model;
+      const foundUser = await UserModel.findOne({ email: userData?.email });
 
       if (foundUser) {
-        next(new UserEmailAlreadyExistsException(foundUser.email));
+        throw new UserEmailAlreadyExistsException(foundUser.email);
       } else {
-        const hashedPassword = await bcrypt.hash(userData.password, 10);
+        const hashedPassword = await bcrypt.hash(userData?.password, 10);
         const user = await UserModel.create({
           ...userData,
           password: hashedPassword,
@@ -28,49 +44,54 @@ router.post(
         const tokenData = createToken(user);
         response.setHeader('Set-Cookie', [createCookie(tokenData)]);
 
-        response.send({
+        return {
           data: {
             user: { email: user.email },
           },
           message: 'User successfully created',
-        });
+        };
       }
-    } catch (err) {
-      next(err);
     }
-  }
+  )
 );
+
+interface ILoginUserResponse {
+  message: string;
+  data: {
+    user: {
+      email: string;
+    };
+  };
+}
 
 router.post(
   '/login',
-  async (request: Request, response: Response, next: NextFunction) => {
-    try {
-      const user = await UserModel.findOne({ email: request.body.email });
-
-      if (user) {
-        const isPasswordMatching = await bcrypt.compare(
-          request.body.password,
-          user.password
-        );
-        if (isPasswordMatching) {
-          const tokenData = createToken(user);
-          response.setHeader('Set-Cookie', [createCookie(tokenData)]);
-          response.send({
-            data: {
-              user: { email: user.email },
-            },
-            message: 'User successfully created',
-          });
-        } else {
-          next(new WrongCredentialsException());
-        }
-      } else {
-        next(new WrongCredentialsException());
+  validationWrapper<LoginUserDto, ILoginUserResponse>(
+    LoginUserDto,
+    async (request: GenericRequest<LoginUserDto>, response: Response) => {
+      const user = await UserModel.findOne({ email: request.model?.email });
+      if (!user) {
+        throw new WrongCredentialsException();
       }
-    } catch (err) {
-      next(err);
+      const isPasswordMatching = await bcrypt.compare(
+        request.model?.password,
+        user.password
+      );
+      if (!isPasswordMatching) {
+        throw new WrongCredentialsException();
+      }
+
+      const tokenData = createToken(user);
+      response.setHeader('Set-Cookie', [createCookie(tokenData)]);
+
+      return {
+        data: {
+          user: { email: user.email },
+        },
+        message: 'Successfully logged in',
+      };
     }
-  }
+  )
 );
 
 router.post('/logout', (request: Request, response: Response) => {
