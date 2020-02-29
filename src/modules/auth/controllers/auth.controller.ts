@@ -1,3 +1,5 @@
+import { Router, Request, Response } from 'express';
+
 import {
   authorizeUser,
   checkCredentials,
@@ -5,8 +7,6 @@ import {
 } from './../services/auth.service';
 import { findByEmail, createUser } from './../../user/services/user.service';
 import { GenericRequest } from '../../../types/controller';
-import { Router, Request, Response, NextFunction } from 'express';
-
 import WrongCredentialsException from '../exceptions/wrong-credentials.exception';
 import UserEmailAlreadyExistsException from '../../user/exceptions/user-email-already-exists.exception';
 import CreateUserDto from '../../../validators/create-user.dto';

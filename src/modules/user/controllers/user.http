@@ -1,6 +1,6 @@
 GET http://localhost:3000/api/user HTTP/1.1
 content-type: application/json
-Cookie: Authorization=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZTRmZGUwZTZiZTZlYzA5YjhlMTRmZjQiLCJpYXQiOjE1ODI4MDY0MjAsImV4cCI6MTU4MjgxMDAyMH0.B5wvtre2yxEzDtDCu1geA2pfj4ykOtFjuVKQyBsgpcc
+Cookie: Authorization=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZTUwNGIwZjlmYTUwYjBiNDRjNDc0M2UiLCJpYXQiOjE1ODI5OTc5NTQsImV4cCI6MTU4MzAwMTU1NH0.jknn_x3Zz-BfAefFDoWd2zEplPnGUcuB3z5E8Fx9prs
 
 {}
 
