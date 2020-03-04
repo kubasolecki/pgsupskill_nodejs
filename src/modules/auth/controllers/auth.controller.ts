@@ -4,27 +4,32 @@ import {
   authorizeUser,
   checkCredentials,
   logout,
-} from './../services/auth.service';
+} from '../services/auth.service';
 import { findByEmail, createUser } from './../../user/services/user.service';
-import { GenericRequest } from '../../../types/controller';
-import WrongCredentialsException from '../exceptions/wrong-credentials.exception';
+import { GenericRequest, ApiResponse } from '../../../types/controller';
 import UserEmailAlreadyExistsException from '../../user/exceptions/user-email-already-exists.exception';
-import CreateUserDto from '../../../validators/create-user.dto';
-import LoginUserDto from '../../../validators/login-user.dto';
+import CreateUserDto from '../validators/create-user.dto';
+import LoginUserDto from '../validators/login-user.dto';
 import { validationWrapper } from '../../../middleware/validation.wrapper';
 import { AuthTypes } from '../auth';
+import { UserTypes } from '../../user/user';
+import WrongCredentialsException from '../exceptions/wrong-credentials.exception';
 
 const router = Router();
 
 router.post(
   '/register',
-  validationWrapper<CreateUserDto, AuthTypes.RegisterUserResponse>(
+  validationWrapper<UserTypes.CreateUser, ApiResponse<{user: { email: string }}>>(
     CreateUserDto,
-    async (request: GenericRequest<CreateUserDto>, response: Response) => {
+    async (
+      request: GenericRequest<UserTypes.CreateUser>,
+      response: Response
+    ) => {
       const userData = request.model;
       if (!userData) {
         throw new WrongCredentialsException();
       }
+
       const foundUser = await findByEmail(userData.email);
 
       if (foundUser) {
@@ -47,16 +52,22 @@ router.post(
 
 router.post(
   '/login',
-  validationWrapper<LoginUserDto, AuthTypes.LoginUserResponse>(
+  validationWrapper<AuthTypes.LoginUser, ApiResponse<{user: { email: string }}>>(
     LoginUserDto,
-    async (request: GenericRequest<LoginUserDto>, response: Response) => {
-      const foundUser = await checkCredentials(request.model)
+    async (
+      request: GenericRequest<AuthTypes.LoginUser>,
+      response: Response
+    ) => {
+      if (!request.model) {
+        throw new WrongCredentialsException();
+      }
+      const foundUser = await checkCredentials(request.model);
 
       authorizeUser(foundUser, response);
 
       return {
         data: {
-          user: { email: foundUser?.email },
+          user: { email: foundUser.email },
         },
         message: 'Successfully logged in',
       };

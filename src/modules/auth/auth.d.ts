@@ -10,21 +10,8 @@ namespace AuthTypes {
     _id: string;
   }
 
-  interface RegisterUserResponse {
-    message: string;
-    data: {
-      user: {
-        email: string;
-      };
-    };
-  }
-
-  interface LoginUserResponse {
-    message: string;
-    data: {
-      user: {
-        email: string;
-      };
-    };
+  interface LoginUser {
+    email: string;
+    password: string;
   }
 }

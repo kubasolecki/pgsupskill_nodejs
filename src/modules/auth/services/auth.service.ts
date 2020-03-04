@@ -7,7 +7,7 @@ import { UserTypes } from '../../user/user';
 import { AuthTypes } from '../auth';
 import config from '../../../../env';
 import WrongCredentialsException from '../exceptions/wrong-credentials.exception';
-import LoginUserDto from '../../../validators/login-user.dto';
+import env from '../../../../env';
 
 const SALT_OR_ROUNDS = 10;
 
@@ -16,33 +16,25 @@ export const authorizeUser = (user: UserTypes.User, response: Response) => {
   response.setHeader('Set-Cookie', [createCookie(tokenData)]);
 };
 
-export const checkCredentials = async (user?: LoginUserDto) => {
-  if (!user) {
-    throw new WrongCredentialsException();
-  }
+export const checkCredentials = async (user: AuthTypes.LoginUser) => {
   const foundUser = await findByEmail(user.email);
 
   if (!foundUser) {
     throw new WrongCredentialsException();
   }
 
-  const isPasswordMatching = await bcrypt.compare(
-    user.password,
-    foundUser.password
-  );
-
-  if (!isPasswordMatching) {
+  if (!(await isPasswordMatching(user.password, foundUser.password))) {
     throw new WrongCredentialsException();
   }
 
   return foundUser;
 };
 
-export const hashPassword = (password?: string) =>
+export const hashPassword = (password: string) =>
   bcrypt.hash(password, SALT_OR_ROUNDS);
 
 export const createToken = (user: UserTypes.User): AuthTypes.TokenData => {
-  const expiresIn = 60 * 60; // an hour
+  const expiresIn = env.TOKEN_EXPIRES_IN;
   const secret = config.JWT_SECRET;
   const dataStoredInToken: AuthTypes.DataStoredInToken = {
     _id: user._id,
@@ -59,4 +51,9 @@ export const createCookie = (tokenData: AuthTypes.TokenData) => {
 
 export const logout = (response: Response) => {
   response.setHeader('Set-Cookie', ['Authorization=;Max-age=0']);
-}
+};
+
+const isPasswordMatching = async (
+  password: string,
+  compareToPassword: string
+) => await bcrypt.compare(password, compareToPassword);
