@@ -1,5 +1,5 @@
-import HttpException from './http.exception';
-import { UNAUTHORIZED } from '../status_codes';
+import HttpException from '../../../exceptions/http.exception';
+import { UNAUTHORIZED } from '../../../status_codes';
 
 class WrongTokenException extends HttpException {
   constructor() {

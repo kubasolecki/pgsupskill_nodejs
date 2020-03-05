@@ -9,7 +9,7 @@ import { AppController, GenericRequest } from '../types/controller';
 import { validate, ValidationError } from 'class-validator';
 
 export function validationWrapper<T, K>(
-  type: ClassType<T>,
+  type: ClassType<any>,
   controller: AppController<T, K>,
   skipMissingProperties = false
 ): RequestHandler {

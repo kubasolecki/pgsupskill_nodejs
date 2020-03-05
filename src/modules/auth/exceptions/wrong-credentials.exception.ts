@@ -1,5 +1,5 @@
-import HttpException from './http.exception';
-import { BAD_REQUEST } from '../status_codes';
+import HttpException from '../../../exceptions/http.exception';
+import { BAD_REQUEST } from '../../../status_codes';
 
 class WrongCredentialsException extends HttpException {
   constructor() {

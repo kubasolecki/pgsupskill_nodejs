@@ -6,7 +6,7 @@ import cookieParser from 'cookie-parser';
 
 import errorHandler from './middleware/error.middleware';
 import env from '../env';
-import controllers from './controllers';
+import controllers from './routes';
 
 const app = express();
 

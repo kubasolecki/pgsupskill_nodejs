@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
-import UserModel from '../models/user';
-import { Upskill } from '../types/auth';
-import authMiddleware from '../middleware/auth.middleware';
+
+import authMiddleware from '../../../middleware/auth.middleware';
+import UserModel from '../models/user.model';
 
 const router = Router();
 

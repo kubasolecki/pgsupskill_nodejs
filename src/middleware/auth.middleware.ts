@@ -1,30 +1,34 @@
 import { NextFunction, Response, Request } from 'express';
 import jwt from 'jsonwebtoken';
 
-import UserModel from '../models/user';
-import WrongTokenException from '../exceptions/wrong-token.exception';
+import WrongTokenException from '../modules/auth/exceptions/wrong-token.exception';
 import env from '../../env';
-import { Upskill } from '../types/auth';
+import { UserTypes } from '../modules/user/user';
+import { AuthTypes } from '../modules/auth/auth';
+import userModel from '../modules/user/models/user.model';
 
-type AuthorizedRequest = { user?: Upskill.Auth.User } & Request;
+type AuthorizedRequest = { user?: UserTypes.User } & Request;
 
-
-const authMiddleware = async (request: AuthorizedRequest, response: Response, next: NextFunction ) => {
+const authMiddleware = async (
+  request: AuthorizedRequest,
+  response: Response,
+  next: NextFunction
+) => {
   const cookies = request.cookies;
-  
+
   if (cookies && cookies.Authorization) {
     const secret = env.JWT_SECRET;
     try {
       const verificationResponse = jwt.verify(
         cookies.Authorization,
         secret
-      ) as Upskill.Auth.DataStoredInToken;
-      
+      ) as AuthTypes.DataStoredInToken;
+
       const id = verificationResponse._id;
-      const user = await UserModel.findById(id);
-      
+      const user = await userModel.findById(id);
+
       if (user) {
-        request.user= user;
+        request.user = user;
         next();
       }
     } catch (error) {
@@ -33,6 +37,6 @@ const authMiddleware = async (request: AuthorizedRequest, response: Response, ne
   } else {
     next(new WrongTokenException());
   }
-}
+};
 
-export default authMiddleware
+export default authMiddleware;
