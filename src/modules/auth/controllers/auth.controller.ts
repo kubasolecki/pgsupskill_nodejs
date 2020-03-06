@@ -5,14 +5,14 @@ import {
   checkCredentials,
   logout,
 } from '../services/auth.service';
-import { findByEmail, createUser } from './../../user/services/user.service';
-import { GenericRequest, ApiResponse } from '../../../types/controller';
-import UserEmailAlreadyExistsException from '../../user/exceptions/user-email-already-exists.exception';
+import { findByEmail, createUser } from '@/modules/user/services/user.service';
+import { GenericRequest, ApiResponse } from '@/types/controller';
+import UserEmailAlreadyExistsException from '@/modules/user/exceptions/user-email-already-exists.exception';
 import CreateUserDto from '../validators/create-user.dto';
 import LoginUserDto from '../validators/login-user.dto';
-import { validationWrapper } from '../../../middleware/validation.wrapper';
+import { validationWrapper } from '@/middleware/validation.wrapper';
 import { AuthTypes } from '../auth';
-import { UserTypes } from '../../user/user';
+import { UserTypes } from '@/modules/user/user';
 import WrongCredentialsException from '../exceptions/wrong-credentials.exception';
 
 const router = Router();
