@@ -13,6 +13,12 @@ export interface IRepositoryService<T extends IPersistentEntity & Document, Dto 
 }
 export abstract class RepositoryService<T extends IPersistentEntity & Document, Dto extends IPersistentEntity>
     implements IRepositoryService<T, Dto> {
+    delete(id: string): Promise<void> {
+        throw new Error("Method not implemented.");
+    }
+    update(id: string, dto: Partial<Dto>): Promise<Dto> {
+        throw new Error("Method not implemented.");
+    }
     getAll(predicate: (entity: T) => boolean): Promise<Dto[]> {
         throw new Error("Method not implemented.");
     }
@@ -36,6 +42,10 @@ export abstract class RepositoryService<T extends IPersistentEntity & Document, 
 
     abstract mapModelToDto(model: T): Dto;
     abstract mapDtoToModel(dto: Dto): T;
+
+    onEntityCreated(newModel: T): Promise<T> | T { return newModel; }
+    onEntityUpdated(newModel: T): Promise<T> | T { return newModel; }
+    onEntityDeleted(id: string): Promise<void> | void {}
     protected constructor(protected persistentModel: Model<T>) {
 
     }
