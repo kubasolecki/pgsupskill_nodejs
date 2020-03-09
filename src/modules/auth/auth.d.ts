@@ -14,4 +14,9 @@ namespace AuthTypes {
     email: string;
     password: string;
   }
+
+  interface CreateUser {
+    email: string;
+    password: string;
+  }
 }

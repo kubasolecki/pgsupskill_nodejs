@@ -4,28 +4,31 @@ export interface IPersistentEntity {
     id: string;
 }
 
-export interface IRepositoryService<T extends IPersistentEntity & Document, Dto extends IPersistentEntity> {
+export interface IRepositoryService<T extends Document, Dto> {
     getById(id: string): Promise<Dto>;
     getAll(predicate: (entity: T) => boolean): Promise<Dto[]>;
     create(dto: Dto): Promise<Dto>;
     delete(id: string): Promise<void>;
     update(id: string, dto: Partial<Dto>): Promise<Dto>;
 }
-export abstract class RepositoryService<T extends IPersistentEntity & Document, Dto extends IPersistentEntity>
+export abstract class RepositoryService<T extends Document, Dto>
     implements IRepositoryService<T, Dto> {
-    delete(id: string): Promise<void> {
-        throw new Error("Method not implemented.");
+    async delete(id: string): Promise<void> {
+      await this.persistentModel.findByIdAndRemove(id);
+      this.onEntityDeleted(id);
     }
-    update(id: string, dto: Partial<Dto>): Promise<Dto> {
-        throw new Error("Method not implemented.");
+
+    async update(id: string, dto: Partial<Dto>): Promise<Dto> {
+      const foundModel = await this.persistentModel.findById(id);
+      return foundModel?.update(dto);
     }
     getAll(predicate: (entity: T) => boolean): Promise<Dto[]> {
         throw new Error("Method not implemented.");
     }
     create(dto: Dto): Promise<Dto> {
         const model = this.mapDtoToModel(dto);
-        const newModel = new this.persistentModel(model);
 
+        this.persistentModel.create(model);
         // TODO: continue :)
         throw new Error("Method not implemented.");
     }
@@ -41,7 +44,7 @@ export abstract class RepositoryService<T extends IPersistentEntity & Document, 
     }
 
     abstract mapModelToDto(model: T): Dto;
-    abstract mapDtoToModel(dto: Dto): T;
+    abstract mapDtoToModel(dto: Dto): Partial<T>;
 
     onEntityCreated(newModel: T): Promise<T> | T { return newModel; }
     onEntityUpdated(newModel: T): Promise<T> | T { return newModel; }

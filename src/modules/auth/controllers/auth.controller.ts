@@ -5,7 +5,7 @@ import {
   checkCredentials,
   logout,
 } from '../services/auth.service';
-import { findByEmail, createUser } from '@/modules/user/services/user.service';
+import { findByEmail, createUser } from '@/modules/user/services/user.service.old';
 import { GenericRequest, ApiResponse } from '@/types/controller';
 import UserEmailAlreadyExistsException from '@/modules/user/exceptions/user-email-already-exists.exception';
 import CreateUserDto from '../validators/create-user.dto';
