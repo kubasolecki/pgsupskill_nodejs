@@ -25,12 +25,12 @@ export abstract class RepositoryService<T extends Document, Dto>
     getAll(predicate: (entity: T) => boolean): Promise<Dto[]> {
         throw new Error("Method not implemented.");
     }
-    create(dto: Dto): Promise<Dto> {
+    async create(dto: Dto): Promise<Dto> {
         const model = this.mapDtoToModel(dto);
 
-        this.persistentModel.create(model);
-        // TODO: continue :)
-        throw new Error("Method not implemented.");
+        await this.persistentModel.create(dto);
+
+        return this.mapModelToDto(model);
     }
 
     async getById(id: string): Promise<Dto> {
@@ -43,7 +43,7 @@ export abstract class RepositoryService<T extends Document, Dto>
         return this.mapModelToDto(entity);
     }
 
-    abstract mapModelToDto(model: T): Dto;
+    abstract mapModelToDto(model: Partial<T>): Dto;
     abstract mapDtoToModel(dto: Dto): Partial<T>;
 
     onEntityCreated(newModel: T): Promise<T> | T { return newModel; }
