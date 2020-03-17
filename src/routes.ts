@@ -6,7 +6,7 @@ import authMiddleware from './middleware/auth.middleware';
 
 const router = Router();
 
-router.use('/user', authMiddleware, UserController);
+router.use('/user', UserController);
 router.use('/auth', AuthController);
 
 export default router;

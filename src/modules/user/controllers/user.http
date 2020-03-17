@@ -1,6 +1,6 @@
 GET http://localhost:3000/api/user HTTP/1.1
 content-type: application/json
-Cookie: Authorization=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZTUwNGIwZjlmYTUwYjBiNDRjNDc0M2UiLCJpYXQiOjE1ODI5OTc5NTQsImV4cCI6MTU4MzAwMTU1NH0.jknn_x3Zz-BfAefFDoWd2zEplPnGUcuB3z5E8Fx9prs
+Cookie: Authorization=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZTcxM2Y5ODNmMjI1ZjEzMmM1YWU0MmQiLCJpYXQiOjE1ODQ0ODAxNzQsImV4cCI6MTU4NDQ4MDUzNH0.EuY2uWcuO8rBTkiCFV-_tELZirHAcJYV3lk9eoII46I; HttpOnly
 
 {}
 
@@ -10,7 +10,6 @@ POST http://localhost:3000/api/user HTTP/1.1
 content-type: application/json
 
 {
+    "name": "kuba",
     "email": "kuba@email.com",
-    "firstName": "kuba",
-    "lastName": "2"
 }

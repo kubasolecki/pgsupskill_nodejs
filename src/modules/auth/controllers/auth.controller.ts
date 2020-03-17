@@ -1,43 +1,35 @@
 import { Router, Request, Response } from 'express';
 
-import {
-  authorizeUser,
-  checkCredentials,
-  logout,
-} from '../services/auth.service';
-import { findByEmail, createUser } from '@/modules/user/services/user.service.old';
+import { AuthService } from '../services/auth.service';
 import { GenericRequest, ApiResponse } from '@/types/controller';
 import UserEmailAlreadyExistsException from '@/modules/user/exceptions/user-email-already-exists.exception';
-import CreateUserDto from '../validators/create-user.dto';
 import LoginUserDto from '../validators/login-user.dto';
 import { validationWrapper } from '@/middleware/validation.wrapper';
 import { AuthTypes } from '../auth';
-import { UserTypes } from '@/modules/user/user';
 import WrongCredentialsException from '../exceptions/wrong-credentials.exception';
+import RegisterUserDto from '../validators/register-user.dto';
 
 const router = Router();
+const authService = new AuthService();
 
 router.post(
   '/register',
-  validationWrapper<UserTypes.CreateUser, ApiResponse<{user: { email: string }}>>(
-    CreateUserDto,
-    async (
-      request: GenericRequest<UserTypes.CreateUser>,
-      response: Response
-    ) => {
+  validationWrapper<AuthTypes.User, ApiResponse<{ user: { email: string } }>>(
+    RegisterUserDto,
+    async (request: GenericRequest<AuthTypes.User>, response: Response) => {
+
       const userData = request.model;
       if (!userData) {
         throw new WrongCredentialsException();
       }
 
-      const foundUser = await findByEmail(userData.email);
+      const foundUser = await authService.findByEmail(userData.email);
 
       if (foundUser) {
         throw new UserEmailAlreadyExistsException(foundUser.email);
       } else {
-        const user = await createUser(userData);
-
-        authorizeUser(user, response);
+        userData.password = await authService.hashPassword(userData.password);
+        const user = await authService.create(userData);
 
         return {
           data: {
@@ -52,7 +44,10 @@ router.post(
 
 router.post(
   '/login',
-  validationWrapper<AuthTypes.LoginUser, ApiResponse<{user: { email: string }}>>(
+  validationWrapper<
+    AuthTypes.LoginUser,
+    ApiResponse<{ user: { email: string } }>
+  >(
     LoginUserDto,
     async (
       request: GenericRequest<AuthTypes.LoginUser>,
@@ -61,9 +56,9 @@ router.post(
       if (!request.model) {
         throw new WrongCredentialsException();
       }
-      const foundUser = await checkCredentials(request.model);
+      const foundUser = await authService.checkCredentials(request.model);
 
-      authorizeUser(foundUser, response);
+      authService.authorizeUser(foundUser, response);
 
       return {
         data: {
@@ -76,7 +71,7 @@ router.post(
 );
 
 router.post('/logout', (request: Request, response: Response) => {
-  logout(response);
+  authService.logout(response);
   response.send(200);
 });
 

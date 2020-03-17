@@ -2,58 +2,86 @@ import { Response } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
-import { findByEmail } from './../../user/services/user.service';
-import { UserTypes } from '../../user/user';
 import { AuthTypes } from '../auth';
 import config from '../../../../env';
 import WrongCredentialsException from '../exceptions/wrong-credentials.exception';
 import env from '../../../../env';
+import { RepositoryService } from '../../../common/repository.service';
+import UserModel from '../models/user-auth.model';
+import RegisterUserDto from '../validators/register-user.dto';
 
-const SALT_OR_ROUNDS = 10;
+export class AuthService extends RepositoryService<
+  AuthTypes.User,
+  RegisterUserDto
+> {
+  private readonly SALT_OR_ROUNDS = 10;
 
-export const authorizeUser = (user: UserTypes.User, response: Response) => {
-  const tokenData = createToken(user);
-  response.setHeader('Set-Cookie', [createCookie(tokenData)]);
-};
-
-export const checkCredentials = async (user: AuthTypes.LoginUser) => {
-  const foundUser = await findByEmail(user.email);
-
-  if (!foundUser) {
-    throw new WrongCredentialsException();
+  constructor() {
+    super(UserModel);
   }
 
-  if (!(await isPasswordMatching(user.password, foundUser.password))) {
-    throw new WrongCredentialsException();
+  mapModelToDto({ email, password }: AuthTypes.User): RegisterUserDto {
+    return {
+      email,
+      password,
+    };
   }
 
-  return foundUser;
-};
+  mapDtoToModel(dto: RegisterUserDto): Partial<AuthTypes.User> {
+    return dto;
+  }
 
-export const hashPassword = (password: string) =>
-  bcrypt.hash(password, SALT_OR_ROUNDS);
+  async findByEmail(email: string) {
+    return await UserModel.findOne({ email });
+  }
 
-export const createToken = (user: UserTypes.User): AuthTypes.TokenData => {
-  const expiresIn = env.TOKEN_EXPIRES_IN;
-  const secret = config.JWT_SECRET;
-  const dataStoredInToken: AuthTypes.DataStoredInToken = {
-    _id: user._id,
-  };
-  return {
-    expiresIn,
-    token: jwt.sign(dataStoredInToken, secret, { expiresIn }),
-  };
-};
+  authorizeUser(user: AuthTypes.User, response: Response) {
+    const tokenData = this.createToken(user);
+    response.setHeader('Set-Cookie', [this.createCookie(tokenData)]);
+  }
 
-export const createCookie = (tokenData: AuthTypes.TokenData) => {
-  return `Authorization=${tokenData.token}; HttpOnly; Max-Age=${tokenData.expiresIn}`;
-};
+  logout(response: Response) {
+    response.setHeader('Set-Cookie', ['Authorization=;Max-age=0']);
+  }
 
-export const logout = (response: Response) => {
-  response.setHeader('Set-Cookie', ['Authorization=;Max-age=0']);
-};
+  async checkCredentials(user: AuthTypes.LoginUser) {
+    const foundUser = await this.findByEmail(user.email);
 
-const isPasswordMatching = async (
-  password: string,
-  compareToPassword: string
-) => await bcrypt.compare(password, compareToPassword);
+    if (!foundUser) {
+      throw new WrongCredentialsException();
+    }
+
+    if (!(await this.isPasswordMatching(user.password, foundUser.password))) {
+      throw new WrongCredentialsException();
+    }
+
+    return foundUser;
+  }
+
+  hashPassword(password: string) {
+    return bcrypt.hash(password, this.SALT_OR_ROUNDS);
+  }
+
+  private async isPasswordMatching(
+    password: string,
+    compareToPassword: string
+  ) {
+    return await bcrypt.compare(password, compareToPassword);
+  }
+
+  private createToken(user: AuthTypes.User): AuthTypes.TokenData {
+    const expiresIn = env.TOKEN_EXPIRES_IN;
+    const secret = config.JWT_SECRET;
+    const dataStoredInToken: AuthTypes.DataStoredInToken = {
+      _id: user._id,
+    };
+    return {
+      expiresIn,
+      token: jwt.sign(dataStoredInToken, secret, { expiresIn }),
+    };
+  }
+
+  private createCookie(tokenData: AuthTypes.TokenData) {
+    return `Authorization=${tokenData.token}; HttpOnly; Max-Age=${tokenData.expiresIn}`;
+  }
+}

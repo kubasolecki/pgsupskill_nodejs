@@ -19,4 +19,9 @@ namespace AuthTypes {
     email: string;
     password: string;
   }
+
+  interface User extends Document {
+    email: string;
+    password: string;
+  }
 }
