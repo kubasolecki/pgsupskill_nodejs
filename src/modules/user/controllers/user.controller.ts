@@ -15,12 +15,12 @@ const userService = new UserService();
 router.use(authMiddleware);
 
 router.get('/', async (_: Request, response: Response) => {
-  const users = await userService.getAll();
+  // const users = await userService.getAll();
 
 
-  response.json({
-    data: users,
-  });
+  // response.json({
+  //   data: users,
+  // });
 });
 
 router.post('/',

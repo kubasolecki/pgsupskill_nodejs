@@ -10,29 +10,37 @@ import { RepositoryService } from '../../../common/repository.service';
 import UserModel from '../models/user-auth.model';
 import RegisterUserDto from '../validators/register-user.dto';
 
-export class AuthService extends RepositoryService<
+interface IAuthService {
+  findByEmail(email: string): Promise<RegisterUserDto>;
+  checkCredentials(user: AuthTypes.LoginUser): Promise<RegisterUserDto>;
+}
+
+export class AuthService extends RepositoryService <
   AuthTypes.User,
   RegisterUserDto
-> {
+> implements IAuthService{
   private readonly SALT_OR_ROUNDS = 10;
 
   constructor() {
     super(UserModel);
   }
 
-  mapModelToDto({ email, password }: AuthTypes.User): RegisterUserDto {
+  protected mapModelToDto({ email }: AuthTypes.User): RegisterUserDto {
     return {
       email,
-      password,
     };
   }
 
-  mapDtoToModel(dto: RegisterUserDto): Partial<AuthTypes.User> {
+  protected mapDtoToModel(dto: RegisterUserDto): Partial<AuthTypes.User> {
     return dto;
   }
 
   async findByEmail(email: string) {
-    return await UserModel.findOne({ email });
+    const foundUser = await UserModel.findOne({ email });
+    if (!foundUser) {
+      throw new WrongCredentialsException();
+    }
+    return this.mapModelToDto(foundUser);
   }
 
   authorizeUser(user: AuthTypes.User, response: Response) {
